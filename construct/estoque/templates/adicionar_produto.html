@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load filters %}
+{% load static %}
+
+{% block 'head' %} 
+<link href="{% static 'estoque/css/main.css' %}" rel="stylesheet" />
+
+{% endblock %}
+{% block 'title' %} Cadastrar Produto {% endblock %}
+
+{% block 'body' %}
+<div class="container">
+
+    {% if messages %}
+    <br/>
+        {% for message in messages %}
+            <div class="alert {{message.tags}}" role="alert">
+                {{message}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>                              
+            </div>
+        {% endfor %}
+    {% endif %}    
+    <form action="{% url 'adicionar_produto' %}" method="POST" enctype="multipart/form-data" name="adicionar_produto"> {% csrf_token %}
+        <br/>
+        <label>Imagens:</label>
+            <input class="form-control" type="file" name="imagens"  accept="image/*" multiple />
+        <br/> <br/>
+
+        <label>Nome:</label>
+        <input  class="form-control" type="text" name="nome_produto" />
+        <br/> <br/>
+
+        <label>Selecione a categoria do produto</label>
+        <select  class="form-control" name="categoria">
+            {% for categoria in categorias %}
+                <option value="{{categoria.id}}">{{categoria.titulo}}</option>
+            {% endfor %}
+            
+        </select>
+        <br/> <br/>
+
+        <label>Estoque inicial:</label>
+        <input class="form-control" type="number" name="quantidade" min="1"  value="1" />
+        <br/> <br/>
+
+        <label>Preço de compra:</label>
+        <input class="form-control" type="number" name="preco_compra" min="1"  value="1" />
+        <br/> <br/>
+
+        <label>Preço de venda:</label>
+        <input class="form-control" type="number" name="preco_venda" min="1"  value="1" />
+        <br/> <br/>
+
+        <input class="btn btn-success" type="submit" value="Enviar" />
+
+    </form>
+    <hr style="background-color: gray;">
+    <form action="{% url 'adicionar_produto' %}" method="GET">
+        <div class="row">
+            <div class="col-md">
+                <input class="form-control" type="text" name="nome" placeholder="Nome do produto..." />
+            </div>
+
+            <div class="col-md">
+                <select class="form-control" name="categoria">
+                    <option value="">Todas as categorias</option>
+                    {% for categoria in categorias %}
+                        <option value="{{categoria.id}}">{{categoria.titulo}}</option>
+                    {% endfor %}                    
+                </select>
+            </div>
+
+            <div class="col-md">
+                <input class="form-control" type="number" name="preco_min" placeholder="Preço mínimo" />
+            </div>
+
+            <div class="col-md">
+                <input class="form-control" type="number" name="preco_max" placeholder="Preço máximo" />
+            </div>
+
+            <div class="col-md">
+                <input type="submit" value="Filtrar" class="btn btn-success" />                
+            </div>            
+        </div>        
+    </form>
+    <hr style="background-color: gray;">
+    <br />
+    <div class="listar_produtos">
+        <div class="row">
+        {% for produto in produtos %}
+            <div class="col-md">
+                <div style="background-color: #0f0f0f;width: 18rem;" class="card">
+                {% if produto|get_first_image %}
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <img width="100%" class="card-img-top embed-responsive-item" src="{{produto|get_first_image}}" />
+                    </div>
+                {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{produto.nome}}</h5>
+                        <span class="badge badge-info">{{produto.categoria}}</span>
+                        <br>
+                        <br>
+                        <a href="{% url 'produto' produto.slug %}" class="btn btn-primary">Acessar</a>
+                    </div>
+                </div>
+                <br>
+            </div>
+        {% endfor %}
+        </div>   
+    </div>
+</div>
+{% endblock %}
